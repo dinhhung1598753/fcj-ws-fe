@@ -4,40 +4,19 @@ import "./index.css";
 import App from "./App";
 import { Provider } from "react-redux";
 import store from "./store";
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login";
 import Callback from "./pages/Callback";
-import Cookies from "js-cookie";
-
-const isAuth = Cookies.get("accessToken");
-
-const ProtectedRouteApp = ({ isAuth }) => {
-  if (!isAuth) {
-    return <Navigate to="/login" />;
-  }
-  return <App />;
-};
-
-const ProtectedRouteLogin = ({ isAuth }) => {
-  if (isAuth) {
-    return <Navigate to="/" />;
-  }
-  return <Login />;
-};
 
 const router = createBrowserRouter([
   {
     path: "/",
     index: true,
-    element: <ProtectedRouteApp />,
+    element: <App />,
   },
   {
     path: "/login",
-    element: <ProtectedRouteLogin isAuth={isAuth} />,
+    element: <Login />,
   },
   {
     path: "/callback",

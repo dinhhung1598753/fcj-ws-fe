@@ -7,10 +7,8 @@ const Callback = () => {
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
-    console.log("hash: ", hash);
     const params = new URLSearchParams(hash);
     const accessToken = params.get("access_token");
-    console.log("accessToken: ", accessToken);
 
     if (accessToken) {
       Cookies.set("accessToken", accessToken);
