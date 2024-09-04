@@ -5,7 +5,7 @@ import App from "./App";
 import { Provider } from "react-redux";
 import store from "./store";
 import {
-  createBrowserRouter,
+  createHashRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
@@ -29,7 +29,7 @@ const ProtectedRouteLogin = ({ isAuth }) => {
   return <Login />;
 };
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     index: true,
