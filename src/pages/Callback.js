@@ -7,6 +7,7 @@ const Callback = () => {
   let { search } = useLocation();
 
   useEffect(() => {
+    console.log("hehehe: ", search);
     const query = new URLSearchParams(search);
     const accessToken = query.get("access_token")?.trim();
 
