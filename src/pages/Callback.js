@@ -5,11 +5,11 @@ import { useEffect } from "react";
 const Callback = () => {
   const navigate = useNavigate();
 
-  const [searchParams, setSearchParams] = useSearchParams();
   useEffect(() => {
-    console.log("hehehe: ", searchParams);
-    // const query = new URLSearchParams(search);
-    const accessToken = searchParams.get("access_token")?.trim();
+    const hash = window.location.hash.slice(1);
+    console.log("hash: ", hash);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
     console.log("accessToken: ", accessToken);
 
     if (accessToken) {
