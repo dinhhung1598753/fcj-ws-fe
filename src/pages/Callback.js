@@ -1,15 +1,16 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 
 const Callback = () => {
   const navigate = useNavigate();
-  let { search } = useLocation();
 
   useEffect(() => {
-    console.log("hehehe: ", search);
-    const query = new URLSearchParams(search);
-    const accessToken = query.get("access_token")?.trim();
+    const [searchParams, setSearchParams] = useSearchParams();
+    console.log("hehehe: ", searchParams);
+    // const query = new URLSearchParams(search);
+    const accessToken = searchParams.get("access_token")?.trim();
+    console.log("accessToken: ", accessToken);
 
     if (accessToken) {
       Cookies.set("accessToken", accessToken);
