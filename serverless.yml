@@ -1,0 +1,76 @@
+service: fcj-ws-fe
+
+provider:
+  name: aws
+  region: ap-southeast-1
+  stage: dev
+
+resources:
+  Resources:
+    # Define the S3 bucket resource
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        # Specify the bucket name with a dynamic name based on the service and stage
+        BucketName: ${self:service}-${self:provider.stage}
+        WebsiteConfiguration: # Configure the bucket to serve a static website
+          IndexDocument: index.html # Default page to serve
+          ErrorDocument: index.html # Error page to serve (useful for single-page apps)
+        PublicAccessBlockConfiguration: # Disable public access block
+          BlockPublicAcls: false
+          IgnorePublicAcls: false
+          BlockPublicPolicy: false
+          RestrictPublicBuckets: false
+
+    # Set the bucket policy to allow public read access
+    S3BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref S3Bucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: "*"
+              Action: "s3:GetObject"
+              Resource: !Sub "${S3Bucket.Arn}/*"
+
+    # Define the CloudFront distribution resource
+    CloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Enabled: true # Enable the CloudFront distribution
+          Origins:
+            - DomainName: !Sub "${S3Bucket}.s3-website-${self:provider.region}.amazonaws.com" # Use the S3 website endpoint
+              Id: S3Origin # Unique ID for this origin in the distribution
+              CustomOriginConfig:
+                HTTPPort: 80
+                HTTPSPort: 443
+                OriginProtocolPolicy: http-only
+          DefaultCacheBehavior:
+            TargetOriginId: S3Origin # Link the default behavior to the S3 origin
+            ViewerProtocolPolicy: redirect-to-https # Redirect HTTP requests to HTTPS
+            AllowedMethods:
+              - GET # Allow GET requests
+              - HEAD # Allow HEAD requests
+            CachedMethods:
+              - GET # Cache GET requests
+              - HEAD # Cache HEAD requests
+            ForwardedValues:
+              QueryString: false # Do not forward query strings to the origin (S3)
+              Cookies:
+                Forward: none # Do not forward cookies to the origin (S3)
+          DefaultRootObject: index.html # Serve index.html when accessing the root of the CloudFront domain
+          ViewerCertificate:
+            CloudFrontDefaultCertificate: true # Use the default CloudFront certificate (*.cloudfront.net)
+          PriceClass: PriceClass_100 # Limit CloudFront to the lowest-cost edge locations
+          HttpVersion: http2 # Use HTTP/2 for better performance
+          Comment: "CloudFront distribution for serving S3 static website" # Description of the distribution
+
+  Outputs:
+    # Output the CloudFront domain name
+    CloudFrontDomain:
+      Value:
+        Fn::GetAtt: [CloudFrontDistribution, DomainName] # Get the domain name of the CloudFront distribution
